@@ -6,6 +6,7 @@ import FunctionHelper from '../functionhelper';
 import QueryInterface from '../query/methods';
 import { assign, merge } from 'lodash';
 import batchInsert from './batchInsert';
+import batchUpsert from './batchUpsert';
 import * as bluebird from 'bluebird';
 import { isNode6 } from './version-helper';
 
@@ -32,6 +33,10 @@ function initContext(knexFn) {
 
     batchInsert(table, batch, chunkSize = 1000) {
       return batchInsert(this, table, batch, chunkSize);
+    },
+
+    batchUpsert(table, batch, updateFields, chunkSize = 1000) {
+      return batchUpsert(this, table, batch, updateFields, chunkSize);
     },
 
     // Runs a new transaction, taking a container and returning a promise
@@ -130,6 +135,7 @@ function redefineProperties(knex, client) {
         // Redefine public API for knex instance that would be proxying methods from correct context
         knex.raw = context.raw;
         knex.batchInsert = context.batchInsert;
+        knex.batchUpsert = context.batchUpsert;
         knex.transaction = context.transaction;
         knex.initialize = context.initialize;
         knex.destroy = context.destroy;
